@@ -29,6 +29,7 @@
 .navbar-logo-img {
   height: 30px;
   width: auto;
+  object-fit: contain;
   filter: brightness(0) invert(1);
   transition: opacity 0.25s ease;
   /* Prevent CSS transitions from fighting with GSAP Flip */
@@ -44,6 +45,8 @@
   right: 0;
   margin: auto;
   height: 80px;
+  width: auto;
+  object-fit: contain;
   /* Large center size */
   max-width: 90vw;
   z-index: 101;
