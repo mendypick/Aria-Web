@@ -12,8 +12,8 @@ if (typeof window !== "undefined") {
 }
 
 export default function HomeClient() {
-  const containerRef = useRef(null);
-  const logoRef = useRef(null);
+  const containerRef = useRef<HTMLElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
 
   // Always start at the top on mount/refresh
   useEffect(() => {
@@ -41,16 +41,16 @@ export default function HomeClient() {
   }, []);
 
   // ARIA Section Refs
-  const ariaStoryRef = useRef(null);
+  const ariaStoryRef = useRef<HTMLDivElement>(null);
 
-  const ariaSection1Ref = useRef(null);
-  const ariaText1Ref = useRef(null);
-  const ariaPhone1Ref = useRef(null);
-  const ariaArrowRef = useRef(null);
+  const ariaSection1Ref = useRef<HTMLElement>(null);
+  const ariaText1Ref = useRef<HTMLDivElement>(null);
+  const ariaPhone1Ref = useRef<HTMLDivElement>(null);
+  const ariaArrowRef = useRef<HTMLDivElement>(null);
 
-  const ariaSection2Ref = useRef(null);
-  const ariaText2Ref = useRef(null);
-  const ariaPhone2Ref = useRef(null);
+  const ariaSection2Ref = useRef<HTMLElement>(null);
+  const ariaText2Ref = useRef<HTMLDivElement>(null);
+  const ariaPhone2Ref = useRef<HTMLDivElement>(null);
 
   const storeButtonsRef = useRef<HTMLDivElement>(null);
 
@@ -75,6 +75,60 @@ export default function HomeClient() {
 
   useGSAP(
     () => {
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      gsap.config({ autoSleep: 60 });
+      gsap.set(
+        [
+          logoRef.current,
+          ariaText1Ref.current,
+          ariaText2Ref.current,
+          ariaPhone1Ref.current,
+          ariaPhone2Ref.current,
+          ariaArrowRef.current,
+          mobileOverlay1Ref.current,
+          mobileOverlay2Ref.current,
+          mobileText1Ref.current,
+          mobileText2Ref.current,
+          mobileArrowRef.current,
+        ].filter(Boolean),
+        { force3D: true, willChange: "transform,opacity" },
+      );
+
+      if (reduceMotion) {
+        gsap.set(
+          [
+            logoRef.current,
+            ariaText1Ref.current,
+            ariaText2Ref.current,
+            ariaPhone1Ref.current,
+            ariaPhone2Ref.current,
+            ariaArrowRef.current,
+            mobileText1Ref.current,
+            mobileText2Ref.current,
+            mobileArrowRef.current,
+          ].filter(Boolean),
+          { clearProps: "transform", opacity: 1 },
+        );
+        gsap.set([mobileOverlay1Ref.current, mobileOverlay2Ref.current], {
+          opacity: 0,
+        });
+        return;
+      }
+
+      const centeredOffset = (element: HTMLElement | null) => {
+        if (!element) return 0;
+        const rect = element.getBoundingClientRect();
+        const elementCenter = rect.left + rect.width / 2;
+        const screenCenter = document.documentElement.clientWidth / 2;
+        return screenCenter - elementCenter;
+      };
+
+      const refreshOnLoad = () => ScrollTrigger.refresh();
+      window.addEventListener("load", refreshOnLoad, { once: true });
+
       // Cinematic Hero Text Fade
       gsap.to(logoRef.current, {
         y: -150,
@@ -100,6 +154,7 @@ export default function HomeClient() {
             pin: true,
             scrub: 1,
             invalidateOnRefresh: true,
+            anticipatePin: 1,
           },
         });
 
@@ -107,14 +162,7 @@ export default function HomeClient() {
         tl1.from(
           ariaPhone1Ref.current,
           {
-            x: () => {
-              if (!ariaPhone1Ref.current) return 0;
-              const el = ariaPhone1Ref.current as HTMLElement;
-              const rect = el.getBoundingClientRect();
-              const elCenter = rect.left + rect.width / 2;
-              const screenCenter = document.documentElement.clientWidth / 2;
-              return screenCenter - elCenter;
-            },
+            x: () => centeredOffset(ariaPhone1Ref.current),
             duration: 2,
             ease: "power2.out",
           },
@@ -125,14 +173,7 @@ export default function HomeClient() {
         tl1.from(
           ariaText1Ref.current,
           {
-            x: () => {
-              if (!ariaText1Ref.current) return 0;
-              const el = ariaText1Ref.current as HTMLElement;
-              const rect = el.getBoundingClientRect();
-              const elCenter = rect.left + rect.width / 2;
-              const screenCenter = document.documentElement.clientWidth / 2;
-              return screenCenter - elCenter;
-            },
+            x: () => centeredOffset(ariaText1Ref.current),
             opacity: 0,
             duration: 1.2,
             ease: "power2.out",
@@ -161,6 +202,7 @@ export default function HomeClient() {
             pin: true,
             scrub: 1,
             invalidateOnRefresh: true,
+            anticipatePin: 1,
           },
         });
 
@@ -168,14 +210,7 @@ export default function HomeClient() {
         tl2.from(
           ariaPhone2Ref.current,
           {
-            x: () => {
-              if (!ariaPhone2Ref.current) return 0;
-              const el = ariaPhone2Ref.current as HTMLElement;
-              const rect = el.getBoundingClientRect();
-              const elCenter = rect.left + rect.width / 2;
-              const screenCenter = document.documentElement.clientWidth / 2;
-              return screenCenter - elCenter;
-            },
+            x: () => centeredOffset(ariaPhone2Ref.current),
             duration: 1.2,
             ease: "power2.out",
           },
@@ -186,14 +221,7 @@ export default function HomeClient() {
         tl2.from(
           ariaText2Ref.current,
           {
-            x: () => {
-              if (!ariaText2Ref.current) return 0;
-              const el = ariaText2Ref.current as HTMLElement;
-              const rect = el.getBoundingClientRect();
-              const elCenter = rect.left + rect.width / 2;
-              const screenCenter = document.documentElement.clientWidth / 2;
-              return screenCenter - elCenter;
-            },
+            x: () => centeredOffset(ariaText2Ref.current),
             opacity: 0,
             duration: 1.2,
             ease: "power2.out",
@@ -211,6 +239,7 @@ export default function HomeClient() {
             end: "+=800",
             pin: true,
             scrub: 1,
+            anticipatePin: 1,
           },
         });
         tl1.to(
@@ -245,6 +274,7 @@ export default function HomeClient() {
             end: "+=800",
             pin: true,
             scrub: 1,
+            anticipatePin: 1,
           },
         });
         tl2.to(
@@ -299,6 +329,10 @@ export default function HomeClient() {
           }
         });
       }
+
+      return () => {
+        window.removeEventListener("load", refreshOnLoad);
+      };
     },
     { scope: containerRef },
   );
@@ -314,8 +348,7 @@ export default function HomeClient() {
           priority
           className="object-cover"
           sizes="100vw"
-          quality={100}
-          unoptimized={true}
+          quality={82}
         />
         {/* Base dark overlay for readability */}
         <div className="absolute inset-0 bg-black/40" />
@@ -425,9 +458,8 @@ export default function HomeClient() {
                   alt="Aria black dating app AI analyzing conversation intent for serious relationships"
                   fill
                   className="object-contain drop-shadow-2xl"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  quality={100}
-                  unoptimized={true}
+                  sizes="(max-width: 768px) 320px, (max-width: 1024px) 340px, 380px"
+                  quality={88}
                 />
               </div>
             </div>
@@ -471,9 +503,8 @@ export default function HomeClient() {
                   alt="Black couple matches using Aria dating app for serious relationships"
                   fill
                   className="object-contain drop-shadow-2xl"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  quality={100}
-                  unoptimized={true}
+                  sizes="(max-width: 768px) 320px, (max-width: 1024px) 340px, 380px"
+                  quality={88}
                 />
               </div>
             </div>

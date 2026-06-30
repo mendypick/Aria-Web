@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import gsap from "gsap";
@@ -27,9 +27,18 @@ export default function Navbar() {
   const loaderBgRef = useRef<HTMLDivElement>(null);
   const navContentRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    document.body.classList.toggle("mobile-menu-open", mobileOpen);
+    return () => document.body.classList.remove("mobile-menu-open");
+  }, [mobileOpen]);
+
   useGSAP(() => {
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
     // Only play the loader animation if the user initially lands on the home page
-    if (pathname !== "/") {
+    if (pathname !== "/" || reduceMotion) {
       if (logoRef.current) logoRef.current.classList.remove("is-loading");
       if (loaderBgRef.current) loaderBgRef.current.style.display = "none";
       if (navContentRef.current)
@@ -38,7 +47,7 @@ export default function Navbar() {
     }
 
     // Briefly hold the loading screen to show the centered logo
-    gsap.delayedCall(0.8, () => {
+    const loaderDelay = gsap.delayedCall(0.8, () => {
       if (!logoRef.current || !loaderBgRef.current || !navContentRef.current)
         return;
 
@@ -77,6 +86,8 @@ export default function Navbar() {
         ease: "power2.out",
       });
     });
+
+    return () => loaderDelay.kill();
   });
 
   return (
@@ -225,7 +236,11 @@ export default function Navbar() {
             e.preventDefault();
             if (typeof window === "undefined") return;
 
-            const ua = navigator.userAgent || navigator.vendor || ((window as unknown) as { opera: string }).opera;
+            const ua =
+              navigator.userAgent ||
+              navigator.vendor ||
+              (window as Window & { opera?: string }).opera ||
+              "";
             // More robust iOS detection including iPad iOS 13+
             const isIOS =
               /iPad|iPhone|iPod/.test(ua) ||

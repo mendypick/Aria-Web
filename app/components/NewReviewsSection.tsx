@@ -17,6 +17,13 @@ interface Review {
   name?: string;
 }
 
+interface CardMotion {
+  x: number;
+  y: number;
+  rotation: number;
+  scale?: number;
+}
+
 const HARDCODED_REVIEWS: Review[] = [
   {
     id: "1",
@@ -56,21 +63,66 @@ const HARDCODED_REVIEWS: Review[] = [
   }
 ];
 
-export default function NewReviewsSection() {
-  // Always render 6 elements to the DOM. GSAP matchMedia handles visibility conditionally
-  // perfectly during resize events by tracking window media queries without React JS re-renders.
-  const displayReviews = [...HARDCODED_REVIEWS].slice(0, 6);
-  // Pad with placeholder data if fewer than 6 reviews exist
-  while (displayReviews.length < 6) {
-    displayReviews.push({ id: `placeholder-${displayReviews.length}`, review_text: "Amazing experience! Highly recommended.", rating: "5", name: "Aria User" });
-  }
+const DISPLAY_REVIEWS = [...HARDCODED_REVIEWS].slice(0, 6);
+while (DISPLAY_REVIEWS.length < 6) {
+  DISPLAY_REVIEWS.push({
+    id: `placeholder-${DISPLAY_REVIEWS.length}`,
+    review_text: "Amazing experience! Highly recommended.",
+    rating: "5",
+    name: "Aria User",
+  });
+}
 
+const DESKTOP_CARD_MOTION: CardMotion[] = [
+  { x: -450, y: -240, rotation: -9 },
+  { x: 450, y: -220, rotation: 8 },
+  { x: -500, y: -20, rotation: -4 },
+  { x: 490, y: 0, rotation: 3 },
+  { x: -450, y: 200, rotation: 5 },
+  { x: 440, y: 220, rotation: -6 },
+];
+
+const MOBILE_CARD_MOTION: CardMotion[] = [
+  { x: 0, y: -180, rotation: -4, scale: 0.9 },
+  { x: 0, y: -60, rotation: 3, scale: 0.92 },
+  { x: 0, y: 60, rotation: -2, scale: 0.95 },
+  { x: 0, y: 180, rotation: 4, scale: 0.92 },
+];
+
+export default function NewReviewsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const phoneRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useGSAP(() => {
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const cards = cardsRef.current.filter(Boolean);
+    const globalDarkOverlay = document.getElementById("global-dark-overlay");
+
+    gsap.set([phoneRef.current, glowRef.current, ...cards].filter(Boolean), {
+      force3D: true,
+      willChange: "transform,opacity",
+    });
+
+    if (reduceMotion) {
+      const staticCardMotion =
+        window.innerWidth < 768 ? MOBILE_CARD_MOTION : DESKTOP_CARD_MOTION;
+      gsap.set(phoneRef.current, { clearProps: "transform", opacity: 1 });
+      gsap.set(glowRef.current, { opacity: 0.28, scale: 0.9 });
+      cards.forEach((card, index) => {
+        const motion = staticCardMotion[index];
+        gsap.set(card, {
+          ...motion,
+          opacity: motion ? 1 : 0,
+          scale: motion?.scale ?? 1,
+        });
+      });
+      return;
+    }
+
     const mm = gsap.matchMedia();
 
     // Desktop Animation
@@ -82,6 +134,7 @@ export default function NewReviewsSection() {
           end: "+=1200", // Smooth scroll distance for the reveal
           pin: true,
           scrub: 1,
+          anticipatePin: 1,
         },
       });
 
@@ -93,11 +146,13 @@ export default function NewReviewsSection() {
       );
 
       // Fade in the global fixed background darkness (Cinematic full-page dimming)
-      tl.to(
-        "#global-dark-overlay",
-        { opacity: 0.5, duration: 1, ease: "power2.out" },
-        0
-      );
+      if (globalDarkOverlay) {
+        tl.to(
+          globalDarkOverlay,
+          { opacity: 0.5, duration: 1, ease: "power2.out" },
+          0
+        );
+      }
 
       // Fade and scale in the red/pink aura (soft glow)
       tl.to(
@@ -106,16 +161,21 @@ export default function NewReviewsSection() {
         0
       );
 
-      // Clean, Organized Outward Spread (Desktop) - Chronological Z-Layout
-      // Latest 2 on Top, Next 2 Mid, Oldest 2 Bottom
-      if (cardsRef.current[0]) tl.to(cardsRef.current[0], { x: -450, y: -240, rotation: -9, opacity: 1, scale: 1, duration: 1, ease: "power2.out" }, 0.05); // Top Left (Newest)
-      if (cardsRef.current[1]) tl.to(cardsRef.current[1], { x: 450, y: -220, rotation: 8, opacity: 1, scale: 1, duration: 1, ease: "power2.out" }, 0.1);  // Top Right (2nd)
-      
-      if (cardsRef.current[2]) tl.to(cardsRef.current[2], { x: -500, y: -20, rotation: -4, opacity: 1, scale: 1, duration: 1, ease: "power2.out" }, 0.15);  // Mid Left (3rd)
-      if (cardsRef.current[3]) tl.to(cardsRef.current[3], { x: 490, y: 0, rotation: 3, opacity: 1, scale: 1, duration: 1, ease: "power2.out" }, 0.2);     // Mid Right (4th)
-      
-      if (cardsRef.current[4]) tl.to(cardsRef.current[4], { x: -450, y: 200, rotation: 5, opacity: 1, scale: 1, duration: 1, ease: "power2.out" }, 0.25);   // Bottom Left (5th)
-      if (cardsRef.current[5]) tl.to(cardsRef.current[5], { x: 440, y: 220, rotation: -6, opacity: 1, scale: 1, duration: 1, ease: "power2.out" }, 0.3);    // Bottom Right (6th)
+      DESKTOP_CARD_MOTION.forEach((motion, index) => {
+        const card = cardsRef.current[index];
+        if (!card) return;
+        tl.to(
+          card,
+          {
+            ...motion,
+            opacity: 1,
+            scale: 1,
+            duration: 1,
+            ease: "power2.out",
+          },
+          0.05 + index * 0.05,
+        );
+      });
     });
 
     // Mobile Animation
@@ -127,6 +187,7 @@ export default function NewReviewsSection() {
           end: "+=1200",
           pin: true,
           scrub: 1,
+          anticipatePin: 1,
         },
       });
 
@@ -138,11 +199,13 @@ export default function NewReviewsSection() {
       );
 
       // Darken global fixed background specifically for mobile to create deep contrast
-      tl.to(
-        "#global-dark-overlay",
-        { opacity: 0.8, duration: 1, ease: "power2.out" },
-        0
-      );
+      if (globalDarkOverlay) {
+        tl.to(
+          globalDarkOverlay,
+          { opacity: 0.8, duration: 1, ease: "power2.out" },
+          0
+        );
+      }
 
       // Subtle glow, very soft
       tl.to(
@@ -151,13 +214,20 @@ export default function NewReviewsSection() {
         0
       );
 
-      // Clean, centered, descending cascade (Mobile)
-      // Array mapped directly to chronological visual order top-to-bottom
-      // Gap tightened to 120px to make layout compact and balanced
-      if (cardsRef.current[0]) tl.to(cardsRef.current[0], { x: 0, y: -180, rotation: -4, opacity: 1, scale: 0.9, duration: 1, ease: "power2.out" }, 0.05); // Top (Newest)
-      if (cardsRef.current[1]) tl.to(cardsRef.current[1], { x: 0, y: -60, rotation: 3, opacity: 1, scale: 0.92, duration: 1, ease: "power2.out" }, 0.15); // Mid-Top (2nd)
-      if (cardsRef.current[2]) tl.to(cardsRef.current[2], { x: 0, y: 60, rotation: -2, opacity: 1, scale: 0.95, duration: 1, ease: "power2.out" }, 0.25); // Mid-Bottom (3rd)
-      if (cardsRef.current[3]) tl.to(cardsRef.current[3], { x: 0, y: 180, rotation: 4, opacity: 1, scale: 0.92, duration: 1, ease: "power2.out" }, 0.35); // Bottom (4th)
+      MOBILE_CARD_MOTION.forEach((motion, index) => {
+        const card = cardsRef.current[index];
+        if (!card) return;
+        tl.to(
+          card,
+          {
+            ...motion,
+            opacity: 1,
+            duration: 1,
+            ease: "power2.out",
+          },
+          0.05 + index * 0.1,
+        );
+      });
     });
 
   }, { scope: containerRef });
@@ -178,7 +248,7 @@ export default function NewReviewsSection() {
       <div className="relative w-full max-w-[1200px] mx-auto flex items-center justify-center h-full z-30 pointer-events-none">
         
         {/* Dynamic HTML Review Cards */}
-        {displayReviews.map((review, idx) => (
+        {DISPLAY_REVIEWS.map((review, idx) => (
           <div 
             key={review.id || idx}
             ref={el => { cardsRef.current[idx] = el; }} 
@@ -196,6 +266,7 @@ export default function NewReviewsSection() {
                   return (
                     <svg 
                       key={starIdx} 
+                      aria-hidden="true"
                       className={`w-[14px] h-[14px] md:w-[16px] md:h-[16px] ${isFilled ? "text-[#fbcbf0] fill-[#fbcbf0]" : "text-white/10 fill-white/10"}`} 
                       viewBox="0 0 20 20" 
                       xmlns="http://www.w3.org/2000/svg"
@@ -236,7 +307,8 @@ export default function NewReviewsSection() {
             width={400} 
             height={800} 
             className="w-full h-auto object-contain"
-            priority={true}
+            sizes="(max-width: 768px) 240px, (max-width: 1024px) 340px, 380px"
+            quality={88}
           />
         </div>
       </div>
