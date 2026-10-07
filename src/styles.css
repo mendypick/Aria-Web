@@ -1161,7 +1161,7 @@ html.is-intro-landed .intro-logo { opacity: 0; }
 
 .intro-rule {
   z-index: 72;
-  top: 58%;
+  top: 64%;
   left: 30%;
   width: min(34vw, 420px);
   height: 1px;

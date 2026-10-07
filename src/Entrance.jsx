@@ -19,14 +19,32 @@ export function shouldPlayIntro() {
   return true;
 }
 
+function placeRule(rule) {
+  const headline = document.querySelector(".hero h1");
+  const button = document.querySelector(".hero .btn");
+  if (!rule || !headline) return;
+  const head = headline.getBoundingClientRect();
+  if (!head.width || !head.height) return;
+  const next = button ? button.getBoundingClientRect() : null;
+  const space = next && next.top > head.bottom ? next.top - head.bottom : 48;
+  const drop = Math.round(Math.min(Math.max(space * 0.42, 18), 34));
+  const width = Math.min(head.width * 0.42, 420);
+  rule.style.top = `${Math.round(head.bottom + drop)}px`;
+  rule.style.width = `${Math.round(width)}px`;
+  rule.style.left = `${Math.round(head.left + (head.width - width) / 2)}px`;
+}
+
 export default function Entrance({ onDone }) {
   const logoRef = useRef(null);
+  const ruleRef = useRef(null);
 
   useLayoutEffect(() => {
     const root = document.documentElement;
     const logo = logoRef.current;
+    const rule = ruleRef.current;
     root.classList.add("is-intro");
     window.scrollTo(0, 0);
+    placeRule(rule);
     try {
       sessionStorage.setItem("aria-intro", "1");
     } catch {
@@ -36,6 +54,7 @@ export default function Entrance({ onDone }) {
     let cancelled = false;
     let moveTimer = 0;
     let doneTimer = 0;
+    let ruleTimer = 0;
 
     const finish = () => {
       if (cancelled) return;
@@ -63,9 +82,17 @@ export default function Entrance({ onDone }) {
 
     const arm = () => {
       if (cancelled) return;
+      placeRule(rule);
       moveTimer = window.setTimeout(travel, MOVE_AT);
+      ruleTimer = window.setTimeout(() => placeRule(rule), 1080);
       doneTimer = window.setTimeout(finish, DONE_AT);
     };
+
+    const onResize = () => placeRule(rule);
+    window.addEventListener("resize", onResize);
+    document.fonts?.ready?.then(() => {
+      if (!cancelled) placeRule(rule);
+    });
 
     if (logo && !logo.complete) {
       logo.addEventListener("load", arm, { once: true });
@@ -77,7 +104,9 @@ export default function Entrance({ onDone }) {
     return () => {
       cancelled = true;
       window.clearTimeout(moveTimer);
+      window.clearTimeout(ruleTimer);
       window.clearTimeout(doneTimer);
+      window.removeEventListener("resize", onResize);
       root.classList.remove("is-intro", "is-intro-landed");
     };
   }, [onDone]);
@@ -85,7 +114,7 @@ export default function Entrance({ onDone }) {
   return (
     <div className="intro" aria-hidden="true">
       <div className="intro-veil" />
-      <span className="intro-rule" />
+      <span ref={ruleRef} className="intro-rule" />
       <img
         ref={logoRef}
         className="intro-logo"
