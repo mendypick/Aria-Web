@@ -31,7 +31,7 @@ export const copy = {
     l2: "with high standards.",
   },
   manifesto:
-    "Aria is the solo — the moment one voice rises above the rest. That’s the idea behind Aria. A dating app for Black singles with high standards, where the goal isn’t to meet everyone — it’s to meet the right people.",
+    "Aria is the solo - the moment one voice rises above the rest. That’s the idea behind Aria. A dating app for Black singles with high standards, where the goal isn’t to meet everyone  it’s to meet the right people.",
   standards: "People at your standards",
   singles: [
     {
@@ -112,7 +112,7 @@ export const copy = {
     },
   ],
   cta: {
-    title: "Eligible Black single? Join Aria.",
+    title: "Black singles? Join Aria.",
     on: "Download on the",
     appStore: "App Store",
     play: "Google Play",
@@ -122,7 +122,7 @@ export const copy = {
     items: [
       [
         "Who is Aria for?",
-        "Aria is built for the Black community — people who are ready for something real. If you’re looking for serious dating and meaningful connections, this is your space.",
+        "Aria is built for the Black community - people with high standards who are ready for something real. If you’re looking for serious dating and meaningful connections, this is your space.",
       ],
       [
         "How does Aria keep conversations serious?",
@@ -130,11 +130,11 @@ export const copy = {
       ],
       [
         "Is Aria easy to use?",
-        "Yes — sign-up is simple and the swiping feels familiar. What’s different is the purpose: every part of the experience is built for serious dating.",
+        "Yes - sign-up is simple and the swiping feels familiar. What’s different is the purpose: every part of the experience is built for serious dating.",
       ],
       [
-        "How is Aria different from the big swiping apps?",
-        "Everyone here wants the same thing — commitment, not casual. Expectations are clear from the moment you join, and AI-monitored conversations keep things respectful and serious. It’s a familiar experience with a fundamentally different purpose.",
+        "How is Aria different?",
+        "Aria is for Black singles with high standards. Everyone here expects more from a relationship, so you’re meeting people who want the same thing you do.",
       ],
       [
         "Is Aria free?",
