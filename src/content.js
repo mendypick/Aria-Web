@@ -27,7 +27,7 @@ export const copy = {
   ],
   getApp: "Get the app",
   hero: {
-    l1: "for Black singles",
+    l1: "Dating for Black singles",
     l2: "with high standards.",
   },
   manifesto:
