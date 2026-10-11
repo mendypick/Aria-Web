@@ -15,6 +15,7 @@
   --sans: "Outfit", "Avenir Next", "Helvetica Neue", sans-serif;
   --pad: clamp(20px, 4vw, 72px);
   --max: 1120px;
+  --nav-h: 90px;
 }
 
 *,
@@ -77,7 +78,7 @@ h1, h2, .manifesto p, .mail {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  height: 90px;
+  height: var(--nav-h);
   padding-inline: clamp(20px, 3vw, 44px);
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
@@ -178,9 +179,10 @@ h1, h2, .manifesto p, .mail {
 
 .hero {
   min-height: 100svh;
+  margin-top: calc(var(--nav-h) * -1);
   display: grid;
   place-items: center;
-  padding: 120px 20px 80px;
+  padding: 0 20px;
   text-align: center;
   background: white;
 }
@@ -847,7 +849,7 @@ section { scroll-margin-top: 90px; }
 }
 
 @media (max-width: 720px) {
-  .hero { min-height: 100svh; padding: 110px 16px 64px; }
+  .hero { padding-inline: 16px; }
   h1 { font-size: clamp(30px, 8.2vw, 42px); }
   h1 span { white-space: nowrap; }
   .mail { font-size: clamp(22px, 6.4vw, 32px); overflow-wrap: anywhere; }

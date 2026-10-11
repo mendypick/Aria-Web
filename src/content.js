@@ -32,7 +32,7 @@ export const copy = {
   },
   manifesto:
     "Aria is the solo - the moment one voice rises above the rest. That’s the idea behind Aria. A dating app for Black singles with high standards, where the goal isn’t to meet everyone  it’s to meet the right people.",
-  standards: "People at your standards",
+  standards: "People who meet your standards",
   singles: [
     {
       src: file("photos/singles/s1.jpg"),
