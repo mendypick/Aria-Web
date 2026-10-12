@@ -14,6 +14,10 @@ function pageFromHash(hash = window.location.hash) {
   return { type: "home", hash: value || "#top" };
 }
 
+function isRealPage(hash) {
+  return pageFromHash(hash).type !== "home";
+}
+
 function deviceStore() {
   const ua = navigator.userAgent || "";
   const iPad = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
@@ -103,6 +107,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
     const sync = () => {
       const next = pageFromHash();
       scrollRef.current = next.type === "home" ? next.hash : null;
@@ -146,7 +151,11 @@ export default function App() {
   const close = () => setOpen(false);
   const goTo = (hash) => {
     setOpen(false);
-    if (window.location.hash !== hash) window.history.pushState(null, "", hash);
+    if (window.location.hash !== hash) {
+      const remember = isRealPage(hash) || isRealPage(window.location.hash);
+      const update = remember ? window.history.pushState : window.history.replaceState;
+      update.call(window.history, null, "", hash);
+    }
     const next = pageFromHash(hash);
     scrollRef.current = next.type === "home" ? next.hash : null;
     setPage(next);

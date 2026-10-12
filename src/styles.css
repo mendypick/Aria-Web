@@ -192,6 +192,7 @@ h1, h2, .manifesto p, .mail {
   justify-items: center;
   text-align: center;
   gap: clamp(36px, 5vh, 64px);
+  container-type: inline-size;
 }
 
 h1 {
@@ -203,7 +204,14 @@ h1 {
   max-width: 11em;
 }
 
+.hero h1 {
+  max-width: 100%;
+  font-size: min(108px, calc(100cqi / 10.25));
+}
+
 h1 span { display: block; white-space: nowrap; }
+
+.hero h1 span { white-space: nowrap; }
 
 .manifesto {
   padding: clamp(88px, 12vw, 150px) 0;
@@ -767,7 +775,6 @@ section { scroll-margin-top: 90px; }
   .nav-links, .nav-cta { display: none; }
   .menu-toggle { display: inline-flex; }
   h1 { font-size: clamp(42px, 12vw, 76px); }
-  h1 span { white-space: normal; }
   .standards h2 { white-space: normal; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .app-tour { background: white; overflow-x: clip; }

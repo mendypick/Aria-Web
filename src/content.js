@@ -12,7 +12,7 @@ export const external = {
 const file = (path) => `${import.meta.env.BASE_URL}${path}`;
 
 export const copy = {
-  metaTitle: "Aria — for Black singles with high standards",
+  metaTitle: "Aria - Black Dating app",
   metaDescription:
     "Aria — a dating app for Black singles with high standards. The goal isn’t to meet everyone. It’s to meet the right people.",
   skip: "Skip to content",
@@ -159,7 +159,7 @@ export const copy = {
     privacy: "Privacy Policy",
     terms: "Terms of Use",
     blog: "Blog",
-    rights: "© Aria — Black Dating App 2026",
+    rights: "© Aria - Black Dating app 2026",
     intention: "Made with intention.",
     socials: [
       ["Instagram", "instagram"],
