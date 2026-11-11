@@ -6,6 +6,20 @@ import { BlogIndex, BlogPost } from "./Blog.jsx";
 import { postBySlug } from "./blog/posts.js";
 import Entrance, { shouldPlayIntro } from "./Entrance.jsx";
 
+const REVEAL_TARGETS = [
+  ".manifesto .wrap > *",
+  ".standards .seal",
+  ".standards h2",
+  ".standards .portraits",
+  ".app-tour h2",
+  ".app-gallery",
+  ".cta h2",
+  ".cta .stores",
+  ".faq h2",
+  ".faq .item",
+  ".support .wrap > *",
+].join(", ");
+
 function pageFromHash(hash = window.location.hash) {
   const value = decodeURIComponent(hash || "");
   if (value === "#privacy" || value === "#terms") return { type: "legal", id: value.slice(1) };
@@ -146,6 +160,32 @@ export default function App() {
     scrollRef.current = null;
     if (hash === "#top" || hash === "#") window.scrollTo(0, 0);
     else document.querySelector(hash)?.scrollIntoView({ behavior: "instant", block: "start" });
+  }, [page]);
+
+  useEffect(() => {
+    if (page.type !== "home" || !("IntersectionObserver" in window)) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const targets = document.querySelectorAll(REVEAL_TARGETS);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries
+          .filter((entry) => entry.isIntersecting)
+          .forEach((entry, index) => {
+            entry.target.style.setProperty("--reveal-delay", `${index * 0.07}s`);
+            entry.target.classList.add("is-in");
+            observer.unobserve(entry.target);
+          });
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.12 }
+    );
+    targets.forEach((el) => {
+      el.classList.add("reveal");
+      observer.observe(el);
+    });
+    return () => {
+      observer.disconnect();
+      targets.forEach((el) => el.classList.remove("reveal", "is-in"));
+    };
   }, [page]);
 
   const close = () => setOpen(false);
@@ -531,19 +571,16 @@ function Chevron({ direction }) {
 
 function Seal() {
   return (
-    <svg className="seal" viewBox="0 0 72 72" aria-hidden="true">
+    <svg className="seal" viewBox="0 0 28 28" aria-hidden="true">
       <path
-        fill="#FF0000"
-        d="M36 4 42 10.2 50.2 8.4 52.8 16.4 60.4 20.2 57.2 27.8 62.8 34.2 56.8 40.2 59.2 48.4 51.4 51.6 50.6 60 42.6 58.2 36 64 29.4 58.2 21.4 60 20.6 51.6 12.8 48.4 15.2 40.2 9.2 34.2 14.8 27.8 11.6 20.2 19.2 16.4 21.8 8.4 30 10.2Z"
+        d="M14 1.8 17 4l3.7-.2 1.1 3.5 3 2.2-1.3 3.5 1.3 3.5-3 2.2-1.1 3.5L17 22l-3 2.2L11 22l-3.7.2-1.1-3.5-3-2.2L4.5 13 3.2 9.5l3-2.2 1.1-3.5L11 4l3-2.2Z"
+        fill="#fff"
       />
       <path
-        d="M26 36.5 33 43.5 47 28.5"
-        fill="none"
-        stroke="#fff"
-        strokeWidth="4.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M14 3.8 16.5 5.7l3-.2.9 2.9 2.4 1.8-1 2.8 1 2.8-2.4 1.8-.9 2.9-3-.2-2.5 1.9-2.5-1.9-3 .2-.9-2.9-2.4-1.8 1-2.8-1-2.8 2.4-1.8.9-2.9 3 .2L14 3.8Z"
+        fill="#007aff"
       />
+      <path d="m9.3 13.9 3 3 6.4-7" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
